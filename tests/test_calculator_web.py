@@ -8,8 +8,9 @@ from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.firefox import GeckoDriverManager
-from selenium.common.exceptions import WebDriverException
 import time
 import sys
 
@@ -29,8 +30,7 @@ def setup_driver():
     firefox_options = FirefoxOptions()
     firefox_options.add_argument("--headless")
     try:
-        service = FirefoxService(GeckoDriverManager().install())
-        driver = webdriver.Firefox(service=service, options=firefox_options)
+        driver = webdriver.Firefox(service=GeckoDriverManager().install(), options=firefox_options)
         print("WebDriver set up successfully.")
         return driver
     except Exception as e:
@@ -56,27 +56,32 @@ def test_calculator(driver):
         print(f"Testing expression: {expression}")
         try:
             # Clear the display
-            driver.find_element(By.ID, "clear").click()
+            driver.execute_script("document.getElementById('display').value = '';")
+            driver.execute_script("document.getElementById('clear').click();")
 
             # Input the expression
             for char in expression:
                 if char == " ":
                     continue
-                driver.find_element(By.XPATH, f"//button[text()='{char}']").click()
+                driver.execute_script(f"document.getElementById('button-{char}').click();")
 
             # Click equals
-            driver.find_element(By.ID, "equals").click()
+            driver.execute_script("document.getElementById('equals').click();")
 
             # Get the result
-            result = driver.find_element(By.ID, "display").get_attribute("value")
+            result = driver.execute_script("document.getElementById('display').value;")
 
             # Check the result
             if result == expected:
                 print(f"Test passed: {expression} = {result}")
             else:
                 print(f"Test failed: {expression} = {result}, expected {expected}")
+                print("Stopping tests due to error.")
+                return
         except Exception as e:
             print(f"Error during test '{expression}': {e}")
+            print("Stopping tests due to error.")
+            return
 
 def main():
     """Main function to run the test script."""
