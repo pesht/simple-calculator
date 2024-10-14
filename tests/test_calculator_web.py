@@ -13,6 +13,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.firefox import GeckoDriverManager
 import time
 import sys
+import requests
+import subprocess
+import os
 
 # Test cases
 TEST_CASES = [
@@ -24,13 +27,23 @@ TEST_CASES = [
     ("5 / 0", "Error")
 ]
 
+def is_server_running(port):
+    try:
+        response = requests.get(f'http://localhost:{port}')
+        return response.status_code == 200
+    except requests.exceptions.RequestException:
+        return False
+
+def start_server():
+    subprocess.Popen(['python', 'simple_calculator/src/simple_calculator/app.py'])
+
 def setup_driver():
     """Set up and return a Firefox WebDriver instance."""
     print("Setting up the WebDriver...")
     firefox_options = FirefoxOptions()
     firefox_options.add_argument("--headless")
     try:
-        driver = webdriver.Firefox(service=GeckoDriverManager().install(), options=firefox_options)
+        driver = webdriver.Firefox(options=firefox_options)
         print("WebDriver set up successfully.")
         return driver
     except Exception as e:
@@ -41,11 +54,12 @@ def test_calculator(driver):
     """Run test cases on the calculator web application."""
     print("Starting calculator tests...")
     try:
+        if not is_server_running(8000):
+            print("Server is not running. Starting it...")
+            start_server()
+            time.sleep(2)  # Wait for server to start
         driver.get("http://localhost:8000")
         print("Navigated to calculator page.")
-    except WebDriverException:
-        print("Error: Unable to connect to the server. Make sure the calculator app is running on http://localhost:8000")
-        return
     except Exception as e:
         print(f"Error navigating to calculator page: {e}")
         return
@@ -55,21 +69,39 @@ def test_calculator(driver):
     for expression, expected in TEST_CASES:
         print(f"Testing expression: {expression}")
         try:
-            # Clear the display
-            driver.execute_script("document.getElementById('display').value = '';")
-            driver.execute_script("document.getElementById('clear').click();")
+            # Wait for clear button to be available
+            clear_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "clear")))
+            clear_button.click()
 
             # Input the expression
             for char in expression:
                 if char == " ":
                     continue
-                driver.execute_script(f"document.getElementById('button-{char}').click();")
+                try:
+                    button = driver.find_element(By.XPATH, f"//button[@onclick=\"appendToDisplay('{char}')\"]")
+                    button.click()
+                except Exception as e:
+                    print(f"Error: Unable to find button for character '{char}': {e}")
+                    print("Stopping tests due to error.")
+                    return
 
             # Click equals
-            driver.execute_script("document.getElementById('equals').click();")
+            try:
+                equals_button = driver.find_element(By.ID, "equals")
+                equals_button.click()
+            except Exception as e:
+                print(f"Error: Unable to find equals button: {e}")
+                print("Stopping tests due to error.")
+                return
 
             # Get the result
-            result = driver.execute_script("document.getElementById('display').value;")
+            try:
+                display_field = driver.find_element(By.ID, "display")
+                result = display_field.get_attribute("value")
+            except Exception as e:
+                print(f"Error: Unable to find display field: {e}")
+                print("Stopping tests due to error.")
+                return
 
             # Check the result
             if result == expected:
