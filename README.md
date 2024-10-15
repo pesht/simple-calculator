@@ -31,27 +31,6 @@ python src/simple_calculator/app.py
 
 The application will be available at `http://localhost:8000`.
 
-## Running Tests
-
-### Unit Tests
-
-To run the unit tests:
-
-```
-python -m unittest tests/test_calculator.py
-```
-
-### API Tests
-
-To run the API tests:
-
-1. Ensure the calculator application is running on `http://localhost:8000`.
-2. In a new terminal window, activate the virtual environment.
-3. Run the API tests:
-   ```
-   python -m unittest tests/test_calculator_api.py
-   ```
-
 ## API Usage
 
 The calculator API can be accessed via HTTP POST requests to `http://localhost:8000/calculate`.
