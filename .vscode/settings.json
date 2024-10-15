@@ -1,0 +1,9 @@
+{
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestPath": "pytest",
+    "python.testing.pytestArgs": [
+        "-v",
+        "-p",
+        "no:pytest-shard-id"
+    ]
+}

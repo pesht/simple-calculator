@@ -1,7 +1,7 @@
 import http.server
 import socketserver
 from urllib.parse import urlparse, parse_qs
-import calculator
+from . import calculator
 import json
 import os
 
