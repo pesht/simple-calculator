@@ -38,7 +38,12 @@ class CalculatorHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
-        self.wfile.write(json.dumps({'result': result}).encode())
+        
+        # Handle the "Error: Division by zero" case
+        if isinstance(result, str) and result.startswith("Error"):
+            self.wfile.write(json.dumps({'result': result}).encode())
+        else:
+            self.wfile.write(json.dumps({'result': result}).encode())
 
 if __name__ == '__main__':
     PORT = 8000
