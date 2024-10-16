@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "Python",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/src/simple_calculator/app.py",
             "console": "integratedTerminal"
