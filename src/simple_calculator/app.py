@@ -1,9 +1,14 @@
 import http.server
 import socketserver
 from urllib.parse import urlparse, parse_qs
-from . import calculator
 import json
 import os
+import sys
+
+# Append the parent directory of the "src" directory to the Python path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+from src.simple_calculator import calculator
 
 class CalculatorHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):

@@ -4,6 +4,8 @@
     "python.testing.pytestArgs": [
         "-v",
         "-p",
-        "no:pytest-shard-id"
+        "no:pytest-selenium",
+        "--driver=chrome",
+        "--rootdir=/mnt/hgfs/AIdev/simple_calculator"
     ]
 }

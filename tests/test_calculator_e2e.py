@@ -6,75 +6,75 @@ from selenium.webdriver.support import expected_conditions as EC
 
 @pytest.mark.usefixtures("setup")
 class TestCalculatorE2E:
-    def test_add(self):
-        self.driver.get("http://localhost:8000")
-        num1_input = self.driver.find_element(By.NAME, "num1")
-        num2_input = self.driver.find_element(By.NAME, "num2")
-        operation_input = self.driver.find_element(By.NAME, "operation")
-        submit_button = self.driver.find_element(By.XPATH, "//input[@type='submit']")
+    def test_add(self, driver):
+        driver.get("http://localhost:8000")
+        num1_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('2')\"]")
+        num2_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('3')\"]")
+        operation_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('+')\"]")
+        equals_button = driver.find_element(By.ID, "equals")
 
-        num1_input.send_keys("2")
-        num2_input.send_keys("3")
-        operation_input.send_keys("add")
-        submit_button.click()
+        num1_input.click()
+        operation_input.click()
+        num2_input.click()
+        equals_button.click()
 
-        result_element = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "result"))
+        result_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "display"))
         )
-        assert result_element.text == "5"
+        assert result_element.get_attribute("value") == "5"
 
-    def test_subtract(self):
-        self.driver.get("http://localhost:8000")
-        num1_input = self.driver.find_element(By.NAME, "num1")
-        num2_input = self.driver.find_element(By.NAME, "num2")
-        operation_input = self.driver.find_element(By.NAME, "operation")
-        submit_button = self.driver.find_element(By.XPATH, "//input[@type='submit']")
+    def test_subtract(self, driver):
+        driver.get("http://localhost:8000")
+        num1_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('2')\"]")
+        num2_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('3')\"]")
+        operation_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('-')\"]")
+        equals_button = driver.find_element(By.ID, "equals")
 
-        num1_input.send_keys("2")
-        num2_input.send_keys("3")
-        operation_input.send_keys("subtract")
-        submit_button.click()
+        num1_input.click()
+        operation_input.click()
+        num2_input.click()
+        equals_button.click()
 
-        result_element = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "result"))
+        result_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "display"))
         )
-        assert result_element.text == "-1"
+        assert result_element.get_attribute("value") == "-1"
 
-    def test_multiply(self):
-        self.driver.get("http://localhost:8000")
-        num1_input = self.driver.find_element(By.NAME, "num1")
-        num2_input = self.driver.find_element(By.NAME, "num2")
-        operation_input = self.driver.find_element(By.NAME, "operation")
-        submit_button = self.driver.find_element(By.XPATH, "//input[@type='submit']")
+    def test_multiply(self, driver):
+        driver.get("http://localhost:8000")
+        num1_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('2')\"]")
+        num2_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('3')\"]")
+        operation_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('*')\"]")
+        equals_button = driver.find_element(By.ID, "equals")
 
-        num1_input.send_keys("2")
-        num2_input.send_keys("3")
-        operation_input.send_keys("multiply")
-        submit_button.click()
+        num1_input.click()
+        operation_input.click()
+        num2_input.click()
+        equals_button.click()
 
-        result_element = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "result"))
+        result_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "display"))
         )
-        assert result_element.text == "6"
+        assert result_element.get_attribute("value") == "6"
 
-    def test_divide(self):
-        self.driver.get("http://localhost:8000")
-        num1_input = self.driver.find_element(By.NAME, "num1")
-        num2_input = self.driver.find_element(By.NAME, "num2")
-        operation_input = self.driver.find_element(By.NAME, "operation")
-        submit_button = self.driver.find_element(By.XPATH, "//input[@type='submit']")
+    def test_divide(self, driver):
+        driver.get("http://localhost:8000")
+        num1_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('6')\"]")
+        num2_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('3')\"]")
+        operation_input = driver.find_element(By.XPATH, "//button[@onclick=\"appendToDisplay('/')\"]")
+        equals_button = driver.find_element(By.ID, "equals")
 
-        num1_input.send_keys("6")
-        num2_input.send_keys("3")
-        operation_input.send_keys("divide")
-        submit_button.click()
+        num1_input.click()
+        operation_input.click()
+        num2_input.click()
+        equals_button.click()
 
-        result_element = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "result"))
+        result_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "display"))
         )
-        assert result_element.text == "2"
+        assert result_element.get_attribute("value") == "2"
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def setup():
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
