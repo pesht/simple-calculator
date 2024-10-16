@@ -3,8 +3,26 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from src.simple_calculator.app import CalculatorHandler
+from http.server import HTTPServer
+from threading import Thread
+import time
 
-@pytest.mark.usefixtures("setup")
+@pytest.fixture(scope="module")
+def server():
+    server = HTTPServer(('localhost', 8000), CalculatorHandler)
+    thread = Thread(target=server.serve_forever)
+    thread.daemon = True
+    thread.start()
+    time.sleep(1)  # Give the server a moment to start
+
+    yield
+
+    server.shutdown()
+    server.server_close()
+    thread.join()
+
+@pytest.mark.usefixtures("server")
 class TestCalculatorE2E:
     def test_add(self, driver):
         driver.get("http://localhost:8000")
@@ -74,10 +92,10 @@ class TestCalculatorE2E:
         )
         assert result_element.get_attribute("value") == "2"
 
-@pytest.fixture(autouse=True)
-def setup():
+@pytest.fixture(scope="module")
+def driver():
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
+    # options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Chrome(options=options)
