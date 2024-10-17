@@ -4,6 +4,7 @@ from urllib.parse import urlparse, parse_qs
 import json
 import os
 import sys
+import socket
 
 # Append the parent directory of the "src" directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -50,8 +51,13 @@ class CalculatorHandler(http.server.SimpleHTTPRequestHandler):
         else:
             self.wfile.write(json.dumps({'result': result}).encode())
 
+class ReuseAddressTCPServer(socketserver.TCPServer):
+    def server_bind(self):
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket.bind(self.server_address)
+
 if __name__ == '__main__':
     PORT = 8000
-    with socketserver.TCPServer(("", PORT), CalculatorHandler) as httpd:
+    with ReuseAddressTCPServer(("", PORT), CalculatorHandler) as httpd:
         print(f"Serving at port {PORT}")
         httpd.serve_forever()
