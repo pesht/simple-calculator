@@ -1,6 +1,7 @@
 # Simple Calculator
 
 This is a simple calculator web application built with Python and Flask. It provides basic arithmetic operations through a web interface and an API.
+Made with the only aim - to test AI assistant development
 
 ## Setup
 
